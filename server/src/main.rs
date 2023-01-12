@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 mod error;
 mod server_config;
 mod client;
@@ -13,7 +11,6 @@ use crate::{
 use std::net::UdpSocket;
 
 use config::Config;
-use chrono::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result<(), ChatError> {

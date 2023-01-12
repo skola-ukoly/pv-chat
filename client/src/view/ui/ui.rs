@@ -16,10 +16,10 @@ pub struct ChatApp {
     username: String,
     server_addr: String,
     server_port: String,
-    ui_state: UiState,
+    ui_state: Page,
 }
 
-impl eframe::App for ChatState {
+impl eframe::App for ChatApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| match self.ui_state {
             Login => self.login_ui(ui),
@@ -28,7 +28,7 @@ impl eframe::App for ChatState {
     }
 }
 
-impl ChatState {
+impl ChatApp {
     pub fn new(socket: UdpSocket) -> Self {
         Self {
             messages: Vec::new(),
@@ -37,7 +37,7 @@ impl ChatState {
             server_addr: String::new(),
             server_port: String::new(),
             chat_input: String::new(),
-            ui_state: UiState::Login,
+            ui_state: Page::Login,
         }
     }
 

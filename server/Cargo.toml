@@ -8,6 +8,4 @@ edition = "2021"
 [dependencies]
 config = "0.13.3"
 tokio = { version = "1", features = ["full"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-chrono = "0.4.23"
+serder = { version = "1", features = ["derive"]}
