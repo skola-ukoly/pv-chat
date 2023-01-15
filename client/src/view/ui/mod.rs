@@ -1,3 +1,3 @@
-mod ui;
+mod gui;
 
-pub use ui::*;
+pub use gui::*;

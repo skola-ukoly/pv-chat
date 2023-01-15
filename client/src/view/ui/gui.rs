@@ -1,17 +1,20 @@
-use eframe::egui;
-use regex::Regex;
+use client::{check_port, check_addr};
+use eframe::egui::{self, TextStyle, ScrollArea};
 use std::net::UdpSocket;
 
+
+
 /// Describes what page ui is in and thus what should be displayed
-enum Page {
+pub enum Page {
     Login,
     Chat,
 }
 
+
+
 /// stores the main state of the app
 pub struct ChatApp {
     pub messages: Vec<String>,
-    pub socket: UdpSocket,
     chat_input: String,
     username: String,
     server_addr: String,
@@ -22,17 +25,16 @@ pub struct ChatApp {
 impl eframe::App for ChatApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| match self.ui_state {
-            Login => self.login_ui(ui),
-            Chat => self.chat_ui(ui),
+            Page::Login => self.login_ui(ui),
+            Page::Chat => self.chat_ui(ui),
         });
     }
 }
 
 impl ChatApp {
-    pub fn new(socket: UdpSocket) -> Self {
+    pub fn new() -> Self {
         Self {
             messages: Vec::new(),
-            socket,
             username: String::new(),
             server_addr: String::new(),
             server_port: String::new(),
@@ -73,24 +75,31 @@ impl ChatApp {
     }
 
     /// Describes the chat Ui
-    fn chat_ui(&mut self, ui: &mut egui::Ui) {}
-}
+    fn chat_ui(&mut self, ui: &mut egui::Ui) {
+        ui.vertical(|ui| {
+            if ui.button("Disconnect!").clicked() {
+                return;
+            };
 
-/// checks if a string is valid IPv4 address
-fn check_addr(addr: &str) -> bool {
-    let addr_pattern = Regex::new(r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$").unwrap();
+            ui.add_space(8.0);
 
-    if addr_pattern.is_match(addr) {
-        true
-    } else {
-        false
+            ui.separator();
+
+            let text_style = TextStyle::Body;
+            let row_height = ui.text_style_height(&text_style);
+            ScrollArea::vertical().stick_to_bottom(true).show_rows(
+                ui,
+                row_height,
+                self.messages.len(),
+                |ui, row_range| {
+                    for row in row_range {
+                        ui.label(self.messages[row].clone());
+                    }
+                },
+            );
+
+            ui.separator(); 
+        });
     }
 }
 
-/// checks if string is a valid port
-fn check_port(port: &str) -> bool {
-    match port.parse::<u16>() {
-        Ok(_) => true,
-        Err(_) => false,
-    }
-}
