@@ -65,7 +65,7 @@ impl ChatApp {
             // user wants to connect to server
             if ui.button("Connect!").clicked() {
                 if !check_addr(&self.server_addr) {
-                    return;
+                    self.ui_state = Page::Chat;
                 }
                 if !check_port(&self.server_port) {
                     return;
