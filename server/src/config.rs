@@ -11,10 +11,11 @@ pub struct ServerConfig {
 
 
 impl ServerConfig {
-    pub fn load() -> Result<Config> {
-        let config = Config::builder()
+    pub fn load() -> Result<Self> {
+        let config: ServerConfig = Config::builder()
             .add_source(config::File::with_name("Config.toml"))
-            .build()?;
+            .build()?
+            .try_deserialize()?;
 
         Ok(config)
     }

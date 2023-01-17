@@ -300,10 +300,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cipher"
-version = "0.1.0"
-
-[[package]]
 name = "clap"
 version = "4.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1881,10 +1877,6 @@ checksum = "e51e73328dc4ac0c7ccbda3a494dfa03df1de2f46018127f60c693f2648455b0"
 dependencies = [
  "libc",
 ]
-
-[[package]]
-name = "sliding_window"
-version = "0.1.0"
 
 [[package]]
 name = "slotmap"

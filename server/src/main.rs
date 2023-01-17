@@ -6,6 +6,7 @@ mod app;
 use app::App;
 
 fn main() -> error::Result<()>{
+    println!("1");
     let app = App {};
     app.run()?;
 
