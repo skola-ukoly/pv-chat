@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 mod error;
 mod config;
 mod types;

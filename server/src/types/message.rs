@@ -1,5 +1,7 @@
 use crate::error::*;
+use std::str;
 
+#[derive(Debug)]
 pub enum MessageHeader {
     LOG = 0,
     DIS = 1,
@@ -20,11 +22,38 @@ impl TryFrom<u8> for MessageHeader {
             _ => Err(ServerError::ParseError)
         }
     }
-
 }
 
-pub struct Message<'a> {
+#[derive(Debug)]
+pub struct Message {
+    pub header: MessageHeader,
     pub sender: String,
-    pub body: &'a [u8],
+    pub body: Vec<u8>,
 }
 
+impl Message {
+    pub fn new(header: MessageHeader, sender: String, body: Vec<u8>) -> Self {
+        Self {
+            header,
+            sender,
+            body,
+        }
+    }    
+
+    pub fn bytes_to_msg(buf: &[u8]) -> Result<Self> {
+        if buf.len() < 17 {
+            return Err(ServerError::Generic);
+        };
+        let header = buf[0].try_into()?;
+        let sender = str::from_utf8(&buf[1..17])?
+            .trim_end_matches('\0')
+            .to_string();
+        let body = buf[17..].to_vec();
+
+        Ok(Self {
+            header,
+            sender,
+            body,
+        })
+    }
+}
