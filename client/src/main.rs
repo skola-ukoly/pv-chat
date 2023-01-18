@@ -1,14 +1,14 @@
 mod error;
 mod types;
 
-mod model;
+mod services;
 mod view;
-mod presenter;
+mod controller;
+mod app;
 
 use view::View;
 
-
 fn main() {
-    let view = View {};
+    let view = View;
     view.run();
 }

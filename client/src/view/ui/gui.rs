@@ -1,8 +1,8 @@
 use client::{check_port, check_addr};
-use eframe::egui::{self, TextStyle, ScrollArea};
-use std::net::UdpSocket;
+use crate::controller::Controller;
+use eframe::{egui::{self, TextStyle, ScrollArea, Ui}, epaint::Color32};
 
-
+const ALERT_COLOR: Color32 = Color32::from_rgb(255, 69, 58);
 
 /// Describes what page ui is in and thus what should be displayed
 pub enum Page {
@@ -14,6 +14,7 @@ pub enum Page {
 
 /// stores the main state of the app
 pub struct ChatApp {
+//    pub controller: Controller,
     pub messages: Vec<String>,
     chat_input: String,
     username: String,
@@ -99,7 +100,22 @@ impl ChatApp {
             );
 
             ui.separator(); 
+
+            ui.horizontal(|ui| {
+                ui.group(|ui| {
+                    ui.text_edit_singleline(&mut self.chat_input);
+                    if ui.button("Send!").clicked() {
+                        let new_message = self.chat_input.clone();
+                        self.chat_input.truncate(0);
+                    };
+                });
+            });
         });
+    }
+
+    fn alert(ui: &mut Ui, content: String) {
+
+
     }
 }
 
