@@ -1,8 +1,20 @@
 use crate::error::*;
 
-pub struct Controller;
+use cipher::Cipher;
+
+
+pub struct Controller {
+    cipher: Cipher,
+    net: CustomNet,
+}
 
 impl Controller {
+    pub fn new(cipher: Cipher, net: CustomNet) -> Self {
+        Self {
+            cipher
+            net
+        } 
+    }
     pub fn connect() {}
 
     pub fn disconnect() {}

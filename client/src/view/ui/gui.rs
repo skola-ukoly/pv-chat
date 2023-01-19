@@ -7,7 +7,7 @@ const ALERT_COLOR: Color32 = Color32::from_rgb(255, 69, 58);
 /// Describes what page ui is in and thus what should be displayed
 pub enum Page {
     Login,
-    Chat,
+    Chat(Controller),
 }
 
 
@@ -27,7 +27,7 @@ impl eframe::App for ChatApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| match self.ui_state {
             Page::Login => self.login_ui(ui),
-            Page::Chat => self.chat_ui(ui),
+            Page::Chat(controller) => self.chat_ui(ui, &controller),
         });
     }
 }
@@ -66,17 +66,21 @@ impl ChatApp {
             // user wants to connect to server
             if ui.button("Connect!").clicked() {
                 if !check_addr(&self.server_addr) {
-                    self.ui_state = Page::Chat;
-                }
+                    return;
+                };
                 if !check_port(&self.server_port) {
                     return;
-                }
+                };
+
+                // chat is free to start, got: server_addr, server_port, username, one_time_pad
+                
+                
             }
         });
     }
 
     /// Describes the chat Ui
-    fn chat_ui(&mut self, ui: &mut egui::Ui) {
+    fn chat_ui(&mut self, ui: &mut egui::Ui, controller: &Controller) {
         ui.vertical(|ui| {
             if ui.button("Disconnect!").clicked() {
                 return;
