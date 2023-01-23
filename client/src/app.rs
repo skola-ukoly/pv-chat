@@ -6,6 +6,6 @@ pub struct App;
 
 impl App {
     pub fn run() {
-        let view = View::new();
+        let view = View;
     }
 }

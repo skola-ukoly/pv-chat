@@ -1,51 +1,69 @@
 use client::{check_port, check_addr};
 use crate::controller::Controller;
+use crate::types::Message;
 use eframe::{egui::{self, TextStyle, ScrollArea, Ui}, epaint::Color32};
 
 const ALERT_COLOR: Color32 = Color32::from_rgb(255, 69, 58);
 
-/// Describes what page ui is in and thus what should be displayed
-pub enum Page {
-    Login,
-    Chat(Controller),
-}
 
+
+enum Page {
+    Login,
+    Chat,
+}
 
 
 /// stores the main state of the app
 pub struct ChatApp {
-//    pub controller: Controller,
-    pub messages: Vec<String>,
-    chat_input: String,
-    username: String,
-    server_addr: String,
-    server_port: String,
-    ui_state: Page,
-}
-
-impl eframe::App for ChatApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| match self.ui_state {
-            Page::Login => self.login_ui(ui),
-            Page::Chat(controller) => self.chat_ui(ui, &controller),
-        });
-    }
+    page: Page,
+    login: LoginPage,
+    chat: ChatPage,
 }
 
 impl ChatApp {
     pub fn new() -> Self {
         Self {
-            messages: Vec::new(),
-            username: String::new(),
-            server_addr: String::new(),
-            server_port: String::new(),
-            chat_input: String::new(),
-            ui_state: Page::Login,
+            page: Page::Login,
+            login: LoginPage {
+                path: None,
+                username: String::new(),
+                server_addr: String::new(),
+                server_port: String::new(),
+            },
+            chat: ChatPage {
+                chat_input: String::new(),
+                messages: Vec::new(),
+            },
         }
     }
+}
 
+impl eframe::App for ChatApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            let page = match &self.page {
+                Page::Login => self.login.login_ui(ui),
+                Page::Chat => self.chat.chat_ui(ui),
+            };
+            self.page = page;
+        });
+    }
+}
+
+
+
+struct LoginPage {
+    username: String,
+    server_addr: String,
+    server_port: String,
+    path: Option<String>,
+}
+
+impl LoginPage {
     /// Describes the Login Ui
-    fn login_ui(&mut self, ui: &mut egui::Ui) {
+    fn login_ui(&mut self, ui: &mut egui::Ui) -> Page {
+        let mut return_page = Page::Login;
+
         ui.vertical(|ui| {
             ui.horizontal(|ui| {
                 let server_addr_label = ui.label("server address:");
@@ -62,27 +80,49 @@ impl ChatApp {
                 ui.text_edit_singleline(&mut self.username)
                     .labelled_by(username_label.id);
             });
+            ui.horizontal(|ui| {
+                let otp_label = ui.label("One timne pad:");
+                if ui.button("choose file").clicked() {
+                    if let Some(path) = rfd::FileDialog::new().pick_file() {
+                        self.path = Some(path.display().to_string());
+                    };
+                };
+            });
 
             // user wants to connect to server
             if ui.button("Connect!").clicked() {
                 if !check_addr(&self.server_addr) {
-                    return;
+                    println!("invalid addr");
+                    return; 
                 };
                 if !check_port(&self.server_port) {
+                    println!("invalid port");
                     return;
                 };
 
-                // chat is free to start, got: server_addr, server_port, username, one_time_pad
-                
-                
-            }
-        });
-    }
+                return_page = Page::Chat;
+            };
 
+
+        });
+
+        return_page
+    }
+}
+
+struct ChatPage {
+    messages: Vec<Message>,
+    chat_input: String,
+}
+
+impl ChatPage {
     /// Describes the chat Ui
-    fn chat_ui(&mut self, ui: &mut egui::Ui, controller: &Controller) {
+    fn chat_ui(&mut self, ui: &mut egui::Ui) -> Page {
+        let mut return_page = Page::Chat;
+
         ui.vertical(|ui| {
             if ui.button("Disconnect!").clicked() {
+                return_page = Page::Login;
                 return;
             };
 
@@ -98,7 +138,7 @@ impl ChatApp {
                 self.messages.len(),
                 |ui, row_range| {
                     for row in row_range {
-                        ui.label(self.messages[row].clone());
+                        ui.label(format!("{}> {}", self.messages[row].sender, self.messages[row].body));
                     }
                 },
             );
@@ -115,11 +155,10 @@ impl ChatApp {
                 });
             });
         });
-    }
 
-    fn alert(ui: &mut Ui, content: String) {
-
-
+        return_page
     }
 }
+
+
 
